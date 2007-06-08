@@ -15,6 +15,7 @@
 *
 ***************************************************************************/
 var maborak = function(){
+	this.tmp= {};
 	/*
 	* Make Core Functions
 	* @access	= Private;
@@ -111,8 +112,8 @@ var maborak = function(){
 			for (var i = 0; i < this.length; i++)
 			{
       			if (this[i] == val){return i};
-      		}
-      		return -1;
+	      		}
+      			return -1;
 		};
 		/*
 		* Remove duplicate values
@@ -320,7 +321,6 @@ var maborak = function(){
 					{
 						var method = (methods[i][1])?((methods[i][1].isArray)?methods[i][1]:[methods[i][1]]):false;
 
-						//tmp = methods[i][0].apply(instance,((methods[i][1])?((methods[i][1].isArray)?methods[i][1]:[methods[i][1]]):null));
 						if(method===false)
 						{
 							tmp = methods[i][0].apply(instance);
@@ -338,7 +338,6 @@ var maborak = function(){
 				}
 			}
 		}
-		//alert("s:"+_return_.length);
 		return (_return_.length==1)?_return_[0]:_return_;
 	};
 	/*
@@ -355,6 +354,7 @@ var maborak = function(){
 	this.checkBrowser = function()
 	{
 		var userAgent=navigator.userAgent;
+		var u;
 		this.browser={
 			isIE:((userAgent.indexOf('MSIE')>=0)?true:false),
 			isNS:((userAgent.indexOf('Netscape6/')>=0)?true:false),
@@ -363,6 +363,12 @@ var maborak = function(){
 			isGK:((userAgent.indexOf('Gecko')>=0)?true:false),
 			isOP:((userAgent.indexOf('Opera')>=0)?true:false)
 		};
+		var checkFor=["MSIE","Netscape/6","Firefox","Safari","Gecko","Opera"];
+		for(var i=0;i<checkFor.length;i++)
+		{
+			var j = userAgent.indexOf(checkFor[i]);
+			this.browser.version = userAgent+"::::"+userAgent.substr(j + checkFor[i].length);
+		}
 	};
 	/*
 	* @class		 = Event manager
@@ -438,6 +444,7 @@ var maborak = function(){
 				_bumble_	:((_bumble_===true)?true:false)
 			};
 			this.db.push(event);
+			return (this.db.length-1);
 		};
 		/*
 		* Remove Event;
@@ -450,10 +457,8 @@ var maborak = function(){
 		*/
 		this.remove=function(_object_,_event_,_function_,_bumble_,uidInDB)
 		{
-			//alert(_function_());
 			_function_=(_function_.isObject)?this.parent.execHandler(_function_):_function_;
 			_object_ = this.parent.dom.element(_object_);
-			//alert(_function_);
 			if (_object_.removeEventListener)
 			{
 				_object_.removeEventListener(_event_,_function_,((_bumble_===true)?true:false));
@@ -548,7 +553,7 @@ var maborak = function(){
 	*/
 	this.exec=function(_function_,_arguments_,_return_,_instance_)
 	{
-		//return ((_instance_)?_instance_:this).loadMethods([[_function_,((_arguments_)?_arguments_:null),_return_ || false]],((_instance_)?_instance_:this));
+		/*return ((_instance_)?_instance_:this).loadMethods([[_function_,((_arguments_)?_arguments_:null),_return_ || false]],((_instance_)?_instance_:this));*/
 		return this.loadMethods([[_function_,((_arguments_)?_arguments_:null),_return_ || false]],((_instance_)?_instance_:this));
 	};
 	/*
@@ -584,7 +589,6 @@ var maborak = function(){
 		var event	=options.event || false;
 		return function(h)
 		{
-			//window.status="=>"+args.length+":"+args.isArray;
 			var argss=(args===false)?false:((args.isArray && isArr===false)?args:[args]);			
 			var param=(event)?[h].concat(argss):argss;
 			if(_function===false)
@@ -680,7 +684,6 @@ var maborak = function(){
 					this.Class.module={};
 				}
 				this.path	= this.options.Path || this.Class.info.base || false;
-				//this.info 	= this.Class.info || false;
 				return (this.path===false)?false:true;
 			}
 			else
@@ -714,7 +717,6 @@ var maborak = function(){
 					});
 					this.file=this.db[this.db.length-1];
 				}
-				//				alert(this.name)
 				for(i=this.file._Package_.length;i>0;i--)
 				{
 					var nm=this.file._Package_[this.file._Package_.length-i];
@@ -766,7 +768,6 @@ var maborak = function(){
 						Package.content.prototype.parent=this._file_.Class;
 					}
 					eval("this._file_.Class.module."+Package.info.Name+"=Package.content;");
-					//this.tmpPgk.prototype.parent = this._file_.Class;
 					for(i=this._file_._Package_.length;i>0;i--)
 					{
 						var nm=this._file_._Package_[this._file_._Package_.length-i];
@@ -863,15 +864,17 @@ maborak.prototype={
 				var elem = (typeof elemID == "string")?document.getElementById(elemID):elemID;
 				if(elem.parentNode)
 				{
-					//alert(3434);
 					elem.parentNode.removeChild(elem);
 				}
 				else if(elem.parentElement)
 				{
-					//document.getElementById("debugwil").innerHTML+=elem+"<br>";
 					elem.parentElement.removeChild(elem);
 				}
 			};
+			this.createUID=function()
+			{
+				return Math.random();
+			}
 		},
 		/*
 		* @class Manage DOM elements
@@ -888,6 +891,15 @@ maborak.prototype={
 			this.element=function(element)
 			{
 				return (!element)?false:((typeof element=="object")?element:((document.getElementById(element))?document.getElementById(element):false));
+			};
+			/*
+			* Automate DOM || HTMLCollection => ArrayDOMCollection
+			* @param {string || DOM} DOM DOM || HTMLCollection
+			* @param {Array} style ArrayDOMCollection
+			*/
+			this.automateDOMToCollection = function(DOM)
+			{
+				return ((!DOM.isArray && (DOM.isObject || (this.parent.browser.isIE && !DOM.isObject))) || DOM.isArray)?DOM:[DOM]
 			};
 			/*
 			* Apply styles to DOM object
@@ -940,22 +952,24 @@ maborak.prototype={
 					rs.push((value == 'auto')?null:value);
 				}
 				return (rs.length<2)?rs[0]:rs;
-				//if (window.opera && ['left', 'top', 'right', 'bottom'].include(style))
+				/*//if (window.opera && ['left', 'top', 'right', 'bottom'].include(style))
 				//{
 				//	if (this.getStyle(element, 'position') == 'static')
 				//	{
 				//		value = 'auto';
 				//	};
-				//}
+				//}*/
 			};
 			/*
 			* es| Capturar coordenadas X,Y de un elemento DOM
-			* @param {string || DOM} DOM String.id || DOM object 
+			* @param {String || DOM} DOM String.id || DOM object 
+			* @param {Boolean} Final Return coordinates x2,y2
 			* @return {Object} position Coordinates x,y 
 			*/
-			this.position=function(DOM,recursive)
+			this.position=function(DOM,Final)
 			{
 				DOM = this.element(DOM);
+				var initial = DOM;
 				if(this.parent.dom.getStyle(DOM,"position")=="absolute")
 				{
 					var position={
@@ -970,16 +984,48 @@ maborak.prototype={
 						y:0
 					};
 					if(!DOM){return position;}
-					position.x=DOM.offsetLeft;
-					position.y=DOM.offsetTop;
+					position.x=parseInt(DOM.offsetLeft,10);
+					position.y=parseInt(DOM.offsetTop,10);
 					while (DOM.offsetParent) {
 						DOM = DOM.offsetParent;
-						position.x += DOM.offsetLeft;
-						position.y += DOM.offsetTop;
+						position.x += parseInt(DOM.offsetLeft,10);
+						position.y += parseInt(DOM.offsetTop,10);
 					}
 				}
-				return position;				
+				return (Final===true)?{x:(position.x+parseInt(initial.offsetWidth,10)),y:(position.y+parseInt(initial.offsetHeight,10))}:position;
 			};
+			/*
+			* Array Collection to HtmlCollection
+			* @param {Array} arrayCollection Array with UID's DOM
+			* @return {Array} HtmlCollection; 
+			*/
+			this.CollectionToArray = function(arrayCollection)
+			{
+				var r=[];
+				for(var i=0;i<arrayCollection.length;i++)
+				{
+					if(document.getElementById(arrayCollection[i]))
+					{
+						r.push(document.getElementById(arrayCollection[i]));
+					}
+				}
+				return r;
+			};
+			/*
+			* Transform HTMLCollection to ArrayCollection
+			* @param {HTMLCOLLECTION} Collection Html Collection
+			* @return {Array} Array Collection; 
+			*/
+			this.CollectionToArray = function(Collection)
+			{
+				var r=[];
+				for(var i=0;i<Collection.length;i++)
+				{
+					r.push(Collection[i]);
+				}
+				return r;
+			};
+			/*;
 			/*
 			* Coordinates x,y Mouse
 			* @param {Event} event Event
@@ -991,6 +1037,26 @@ maborak.prototype={
 						x:(this.parent.browser.isIE)?(window.event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft):(event.clientX + window.scrollX),
 						y:(this.parent.browser.isIE)?(window.event.clientY + document.documentElement.scrollTop + document.body.scrollTop):(event.clientY + window.scrollY)
 					};
+			};
+			/*
+			* DOM elements, range positions
+			* @param {DOM || Array[DOM]} DOM Elements
+			* @return {Object} position Coordinates x1:y1,x2:y2 
+			*/
+			this.positionRange = function(DOM)
+			{
+				DOM = (DOM.isArray)?DOM:[DOM];
+				var r={};
+				for(var i=0;i<DOM.length;i++)
+				{
+					var p1 = this.position(DOM[i]);
+					r.x1=(!r.x1 || (p1.x<r.x1))?p1.x:r.x1;
+					r.y1=(!r.y1 || (p1.y<r.y1))?p1.y:r.y1;
+					var p2 = this.position(DOM[i],true);
+					r.x2=(!r.x2 || (p2.x>r.x2))?p2.x:r.x2;
+					r.y2=(!r.y2 || (p2.y>r.y2))?p2.y:r.y2;
+				}
+				return r;
 			};
 			/*
 			* Capture DOM Element
@@ -1008,9 +1074,7 @@ maborak.prototype={
 				index = (index.length<2)?"0":index[index.length-1];
 				var all = (index==="*")?true:false;				
 				var pindex =index.split(",").onlyInt();	
-				//alert(pindex.length);
 				index = pindex.unique();
-				//alert(index);
 				var by = iDom[0];
 				iDom.splice(0,1);
 				var el = iDom.join(".");
@@ -1030,7 +1094,7 @@ maborak.prototype={
 				}
 				if(all)
 				{
-					return oDom;
+					return this.CollectionToArray(oDom);
 				}
 				else
 				{

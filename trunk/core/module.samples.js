@@ -1,4 +1,4 @@
-var t,j,l,k,g,dAd;
+var t,j,l,k,g,dAd,drop,myPanel;
 var u=function()
 {
 	alert(7);
@@ -37,31 +37,45 @@ var samp = function()
 	//t.callback=leimnud.execHandler({method:j.j,instance:j,arguments:[t,99]});
 	t.callback={Function:myFunction,args:[t,99]};
 	t.make();*/
-	dAd=new leimnud.module.dragAndDrop({
-		//elements:leimnud.dom.capture("tag.div *")
-		//group:leimnud.dom.capture("tag.div *"),
-		/*link:{
-				elements:leimnud.dom.capture("tag.div 1,2"),
-				ref:leimnud.dom.capture("tag.div 0,3")
-		}*/
+	drop = new leimnud.module.drop({
+		elements:leimnud.dom.capture("tag.div *")
+	});
+	drop.make();
+	
+	dAd=new leimnud.module.drag({
+		//elements:leimnud.dom.capture("tag.input *")
+		/*group:[leimnud.dom.capture("tag.div 3"),leimnud.dom.capture("tag.input 1")]*/
 		link:{
-				elements:[leimnud.dom.capture("id.bb")],
-				ref:[leimnud.dom.capture("id.aa")]
+				elements:leimnud.dom.capture("tag.div 1,2"),
+				ref:leimnud.dom.capture("tag.input 0,3")
 		}
 	});
+	dAd.make();
 	dAd.events={
 		init:function(){window.status="iniciando";},
-		move:function(){window.status="moviendo";},
+		//move:function(){window.status="moviendo";},
 		finish:function(){window.status="terminado";}
 	};
-	dAd.make();
-	var j=function(){alert(9)};
-	//leimnud.event.add(leimnud.dom.capture("id.a"),"click",j,false);
-	//leimnud.event.add(leimnud.dom.capture("id.b"),"click",function(){
-		//var k=j;
-		//leimnud.event.remove(leimnud.dom.capture("id.a"),"click",k);
-		//leimnud.dom.capture("id.a").removeEventListener("click",function(){alert(9)},false);
-	//});
+	myPanel=new leimnud.module.panel();
+	myPanel.options={
+		size:{w:300,h:300},
+		position:{x:200,y:200},
+		title:"Mi primer panel",		
+		control:{
+			//close	:true,
+			//roll	:true,
+			drag	:true,
+			resize	:true
+		},
+		fx:{
+			//shadow	:true,
+			opacity	:true
+		},
+		theme:"simple"
+	};
+	myPanel.setStyle={
+	};
+	myPanel.make();
 	
 	window.status = "Samples loaded";
 };

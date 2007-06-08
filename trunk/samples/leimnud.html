@@ -6,28 +6,28 @@
 		<script type="text/javascript">
 		var leimnud = new maborak();
 		leimnud.make();
-		
-		
-		leimnud.Package.Load("samples,rpc,dragAndDrop",{Instance:leimnud,Type:"module"});
+
+
+		leimnud.Package.Load("samples,rpc,drag,drop,panel",{Instance:leimnud,Type:"module"});
 		leimnud.exec(leimnud.fix.memoryLeak);
-		
+
 		//leimnud.Package.Load("processmap",{Type:"File"});
 		//leimnud.Package.Load("processmap",{Type:"File"});
 		//leimnud.Package.Load(false,{Type:"File",Path:"http://wilmer.colosa.net/newGulliver/newgulliver/trunk/sandbox/public_html/js/processmap/core/processmap.js",Absolute:true});
 		//leimnud.Package.Load("rpc,samples",{Instance:leimnud,Type:"module"});
-		
-		
+
+
 		</script>
 		<script type="text/javascript">
 		leimnud.event.add(window,"load",leimnud.module.samples);
 		</script>
 		<style>
 			.pan{
-				background-color:#006699;
+				background-color:#fafbfc;
 				width:200px;
 				height:50px;
 				color:white;
-				font:normal 0.8em Tahoma,MiscFixed; 
+				font:normal 0.8em Tahoma,MiscFixed;
 				text-align:center;
 				vertical-align:bottom;
 			}
