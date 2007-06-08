@@ -4,7 +4,7 @@
 */
 leimnud.Package.Public({
 	info	:{
-		Class	:"leimnud",
+		Class	:"maborak",
 		File	:"module.rpc.js",
 		Name	:"rpc",
 		Type	:"module",

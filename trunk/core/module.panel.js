@@ -1,6 +1,6 @@
 leimnud.Package.Public({
 	info	:{
-		Class	:"leimnud",
+		Class	:"maborak",
 		File	:"module.panel.js",
 		Name	:"panel",
 		Type	:"module",

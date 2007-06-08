@@ -1,5 +1,5 @@
 /***************************************************************************
-*     				  leimnud.js
+*     				  maborak.js
 *                        ---------------------------
 *   Copyleft		: (c) 2007 maborak.com <maborak@maborak.com>
 *   Version		: 1.2.1
@@ -799,9 +799,9 @@ var maborak = function(){
 };
 maborak.prototype={
 	info:{
-		version	:"1.2.0",
-		name	:"leimnud",
-		file	:"leimnud.js"
+		version	:"0.6",
+		name	:"maborak",
+		file	:"maborak.js"
 	},
 	/*
 	* Make this Class

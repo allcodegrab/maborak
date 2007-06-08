@@ -81,7 +81,7 @@ var samp = function()
 };
 leimnud.Package.Public({
 	info	:{
-		Class	:"leimnud",
+		Class	:"maborak",
 		File	:"module.samples.js",
 		Name	:"samples",
 		Type	:"module",

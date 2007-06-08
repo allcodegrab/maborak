@@ -1,6 +1,6 @@
 leimnud.Package.Public({
 	info	:{
-		Class	:"leimnud",
+		Class	:"maborak",
 		File	:"module.drop.js",
 		Name	:"drop",
 		Type	:"module",
@@ -31,9 +31,9 @@ leimnud.Package.Public({
 		this.observer=function()
 		{
 			
-		}
+		};
 	}
-;});
+});
 /*
 gsdfsdf
 */
