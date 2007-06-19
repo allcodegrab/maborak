@@ -53,7 +53,7 @@ leimnud.Package.Public({
 
 			//alert(this.keys[this.lang][this.type]);
 			return (this.keys[this.lang][this.type])?this.keys[this.lang][this.type]:this.keys[this.lang]["Alfa"];
-		}
+		};
 		this.result=function()
 		{
 			if(this.isNumber(param.key))
@@ -66,7 +66,7 @@ leimnud.Package.Public({
 			}
 			else
 			{
-				this.key=false
+				this.key=false;
 			}
 			this.lang= param.lang || "en";
 
@@ -78,16 +78,16 @@ leimnud.Package.Public({
 				valid=this.engine(this.generateKeys());
 				if(valid===true){return true;}
 			}
-			if(this.validArray.length==0)
+			if(this.validArray.length===0)
 			{
 				valid=this.engine([])
 			}
 			return valid;
-		}
+		};
 		this.isNumber=function(a)
 		{
 			return (a>=0)?true:false;
-		}
+		};
 		this.compareChar=function(_string,car) {
 			var i = 0,a=false;
 			//alert(_string+":"+car)
@@ -98,19 +98,19 @@ leimnud.Package.Public({
 			}
 			//alert(a)
 			return a;
-		}
+		};
 		this.isAlfaUS=function()
 		{
 			patron=[];
 			patron[0]=validator.keys.alfa[0];
 			patron[1]=validator.keys.alfa[2];
 			return patron;
-		}
+		};
 		this.isAlfa=function()
 		{
 			patron=validator.keys.alfa;
 			return patron;
-		}
+		};
 		this.checkAdd=function(p)
 		{
 			if(this.add)
@@ -121,7 +121,7 @@ leimnud.Package.Public({
 			{
 				return p;
 			}
-		}
+		};
 		this.engine=function(p)
 		{
 			//alert(this.lang+":"+leimnud.tools.object.toString(p))
@@ -163,7 +163,6 @@ leimnud.Package.Public({
 			}
 			//alert(valid)
 			return valid;
-		}
-
+		};
 	}
 });

@@ -20,14 +20,23 @@ leimnud.Package.Public({
 			this.events =this.events || {};
 			//alert(this.options.elements.length);
 			var elements=(this.options.elements || []).length;
+			this.flagEvents=[];
+			var oThis = this;
 			for(var i=0;i<elements;i++)
 			{
-				this.parent.event.add(this.options.elements[i],"mousedown",this.parent.execHandler({
+				
+				var revent=this.parent.event.add(this.options.elements[i],"mousedown",this.parent.execHandler({
 					method:this.onInit,
 					instance:this,
 					event:true,
-					args:i
+					args:[i,this.options.elements[i]]
 				}),false);
+				/*var oj=this.options.elements[i];
+				var revent = this.parent.event.add(this.options.elements[i],"mousedown",function(rrr){
+					oThis.onInit(rrr || window.event,i,oj);
+				},false);*/
+
+				//this.flagEvents.push(revent);
 				//this.parent.event.add(this.options.elements[i],"mousedown",x,false);
 			}
 			//alert(5);
@@ -58,11 +67,21 @@ leimnud.Package.Public({
 				return [];
 			}
 		};
-		this.onInit=function(event,elNum)
+		this.onInit=function(fEvent,elNum,elem)
 		{
-			var element=this.parent.event.dom(event);
-			this.cursorStart	=this.parent.dom.mouse(event);
-
+			//window.status="onInit:=> "+arguments.length+":::"+event+":"+elNum+":"+elem;
+			//window.status="onInit:=> "+arguments.length+":"+arguments[0]+":"+arguments[1]+":"+arguments[2];
+			if(arguments.length<3 && this.parent.browser.isIE)
+			{
+				elem=elNum;
+				elNum=fEvent;
+				fEvent=window.event;
+			}
+			window.status="onInit:=> "+fEvent+":"+elNum+":"+elem;
+			
+			var position,element	=elem;
+			this.cursorStart	=this.parent.dom.mouse(fEvent);
+		//	window.status=this.cursorStart.toStr()
 			if(this.type=="simple")
 			{
 				this.probeAbsolute(element);
@@ -78,7 +97,7 @@ leimnud.Package.Public({
 				this.elementStart=[];
 				for(var i=0;i<this.options.elements.length;i++)
 				{
-					var position = this.parent.dom.position(this.options.elements[i]);
+					position = this.parent.dom.position(this.options.elements[i]);
 					this.elementStart[i]={
 						x:position.x,
 						y:position.y
@@ -90,9 +109,9 @@ leimnud.Package.Public({
 			{
 				//this.probeAbsoluteGroup();
 				this.elementStart=[];
-				for(var i=0;i<this.linkRef.length;i++)
+				for(i=0;i<this.linkRef.length;i++)
 				{
-					var position = this.parent.dom.position(this.linkRef[i]);
+					position = this.parent.dom.position(this.linkRef[i]);
 					this.elementStart[i]={
 						x:position.x,
 						y:position.y
@@ -100,13 +119,14 @@ leimnud.Package.Public({
 				}
 				this.absolutizeLink();
 			}
-			leimnud.event.add(document,"mousemove",this.parent.execHandler({
+			this.parent.event.add(document,"mousemove",this.parent.execHandler({
 					method:this.onMove,
 					instance:this,
 					event:true,
-					args:[elNum,element]
+					args:[elNum,element,this.parent.event.db.length]
 			}),true);
-			leimnud.event.add(document,"mouseup",this.parent.execHandler({
+			//window.status=this.parent.event.db.length;
+			this.parent.event.add(document,"mouseup",this.parent.execHandler({
 					method:this.onFinish,
 					instance:this,
 					event:true,
@@ -119,7 +139,7 @@ leimnud.Package.Public({
 			}
 			else
 			{
-				event.preventDefault();
+				fEvent.preventDefault();
 			}
 			this.launchEvents(this.events.init);
 		};
@@ -147,9 +167,10 @@ leimnud.Package.Public({
 				}
 			}
 			else if(this.type=="link")
-			{
-				for(var i=0;i<this.linkRef.length;i++)
+			{				
+				for(i=0;i<this.linkRef.length;i++)
 				{
+					//window.status=this.elementStart[i].x+(cursor.x-this.cursorStart.x);
 					this.parent.dom.setStyle(this.linkRef[i],{
 						left:this.elementStart[i].x+(cursor.x-this.cursorStart.x),
 						top:this.elementStart[i].y+(cursor.y-this.cursorStart.y)
@@ -169,14 +190,26 @@ leimnud.Package.Public({
 			//alert(4);
 			//alert(this.parent.dom.mouse(event).toStr());
 		};
-		this.onFinish=function(event,element,elNum,hand)
+		this.onFinish=function(event,elNum,element,hand)
 		{
-			//alert(hand)
+			if(arguments.length<4 && this.parent.browser.isIE)
+			{
+				hand=element;
+				element=elNum;
+				elNum=event;
+				event=window.event;
+			}
+			window.status="Finish=> "+event+":"+elNum+":"+element+":"+hand;
 			//alert(this.parent.event.db[hand].toStr());
 			//var handler = this.parent.event.db[hand]._function_;
 			this.launchEvents(this.events.finish);
 			this.parent.event.remove(document,"mouseup",this.parent.event.db[hand]._function_,true,hand);
 			this.parent.event.remove(document,"mousemove",this.parent.event.db[hand-1]._function_,true,hand-1);
+		};
+		this.flush=function()
+		{
+			this.parent.event.flushCollection(this.flagEvents);
+			this.flagEvents = [];
 		};
 		this.probeAbsolute=function(d0m)
 		{
@@ -212,7 +245,7 @@ leimnud.Package.Public({
 			{
 				this.parent.dom.setStyle(this.options.elements[i],{cursor:this.cursor});
 			}
-			for(var i=0;i<this.linkRef.length;i++)
+			for(i=0;i<this.linkRef.length;i++)
 			{
 				if(this.parent.dom.getStyle(this.linkRef[i],"position")!="absolute")
 				{
@@ -226,7 +259,20 @@ leimnud.Package.Public({
 		};
 		this.launchEvents=function(event)
 		{
-			return (event)?event():false;
+			if(event && event.isArray===true)
+			{
+				for(var i=0;i<event.length;i++)
+				{
+					if(typeof event[i]=="function")
+					{
+						event[i]();
+					}
+				}
+			}
+			else
+			{
+				return (event)?event():false;
+			}
 		};
 	}
 });

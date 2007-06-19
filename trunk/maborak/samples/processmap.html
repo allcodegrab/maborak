@@ -1,0 +1,39 @@
+<html>
+        <head>
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                <title>Prueba processmap</title>
+                <script type="text/javascript" src="../core/maborak.js"></script>
+		<script type="text/javascript">
+		var leimnud = new maborak();
+		leimnud.make();
+		leimnud.Package.Load("rpc,drag,drop,panel",{Instance:leimnud,Type:"module"});
+		leimnud.Package.Load("processmap",{Type:"file"});
+		leimnud.exec(leimnud.fix.memoryLeak);
+		</script>
+		<script type="text/javascript">
+		leimnud.event.add(window,"load",function(){
+			var Pm=new processmap({
+				target		:leimnud.dom.capture("id.container"),
+				dataServer	:"pm.xml",
+				lang		:"en"
+			});	
+			Pm.make();
+		});
+		</script>
+		<style type=text/css>
+			.pan{
+				background-color:#FFFFFF;
+				border:1px dashed red;
+				width:200px;
+				height:50px;
+				color:white;
+				font:normal 0.8em Tahoma,MiscFixed;
+				text-align:center;
+				vertical-align:bottom;
+			}
+		</style>
+        </head>
+	<body>
+		<div id="container" class="container">&nbsp;<div>
+        </body>
+</html>

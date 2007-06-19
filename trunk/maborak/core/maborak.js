@@ -1,7 +1,7 @@
 /***************************************************************************
 *     				  maborak.js
 *                        ---------------------------
-*   Copyleft		: (c) 2007 maborak.com <maborak@maborak.com>
+*   Copyleft	: (c) 2007 maborak.com <maborak@maborak.com>
 *   Version		: 1.2.1
 *
 ***************************************************************************/
@@ -16,15 +16,16 @@
 ***************************************************************************/
 var maborak = function(){
 	this.tmp= {};
-	/*
+	this.charset="utf-8";
+	/**
 	* Make Core Functions
-	* @access	= Private;
+	* @extends String || Array || Object
 	*/
 	this.protoCore=function()
 	{
 		Array.prototype.isArray		= true;
 		Array.prototype.isObject	= false;
-		/*
+		/**
 		* Only Int values in Array
 		* @return Array
 		*/
@@ -40,7 +41,7 @@ var maborak = function(){
 			}
 			return valid;
 		};
-		/*
+		/**
 		* Check if a value exists in an Array
 		* @return Boolean
 		*/
@@ -56,7 +57,7 @@ var maborak = function(){
 			}
 			return false;
 		};
-		/*
+		/**
 		* Fill an array with values
 		* @return Array
 		*/
@@ -68,7 +69,7 @@ var maborak = function(){
 			}
 			return this;
 		};
-		/*
+		/**
 		* Convert (Array || Object) to String
 		* @param {Boolean} strict Optional: Exclude prototype (Methods && Properties)
 		* @return String
@@ -111,11 +112,11 @@ var maborak = function(){
 		{
 			for (var i = 0; i < this.length; i++)
 			{
-      			if (this[i] == val){return i};
-	      		}
-      			return -1;
+      			if (this[i] == val){return i;}
+	      	}
+      		return -1;
 		};
-		/*
+		/**
 		* Remove duplicate values
 		* @return Array 
 		*/
@@ -131,7 +132,7 @@ var maborak = function(){
 			}
 			return a;
 		};
-		/*
+		/**
 		* Fetch a key from an Array
 		* @param {String|Boolean|Int|Object|Array} value Value to search
 		* @return Int
@@ -143,7 +144,7 @@ var maborak = function(){
 			}
 			return false;
 		};
-		/*
+		/**
 		* Return a random element
 		* @param {Int} range Up to range 
 		* @return Value random
@@ -156,7 +157,7 @@ var maborak = function(){
 			else { i = range; range = l + range % l; }
 			return this[ Math.floor( range * Math.random() - i ) ];
 		};
-		/*
+		/**
 		* Randomly interchange elements
 		* @param {Boolean} recursive Shuffle recursive Array elements.
 		* @return Array
@@ -174,7 +175,7 @@ var maborak = function(){
 		};
 		Object.prototype.isObject	= true;
 		Object.prototype.isArray	= false;
-		/*
+		/**
 		* Length of Object
 		* @return Int
 		*/
@@ -189,9 +190,25 @@ var maborak = function(){
 			}
 			return j;
 		};
-		/*
+		/**
+		* Concat Object
+		* @param {Object} obj Object
+		* @return {Object} this
+		*/
+		Object.prototype.concat = function(obj)
+		{
+			for (var i in obj) {
+
+				if(obj.propertyIsEnumerable(i))
+				{
+					this[i]=obj[i];
+				}
+			}
+			return this;
+		};
+		/**
 		* es| Obtener el valor de un Objeto a partir de su Key
-		* @param {key} id Key of object (1,2,3,4,5) 
+		* @param {Int} id Key of object (1,2,3,4,5) 
 		* @return Key value 
 		*/
 		Object.prototype.get	= function(id)
@@ -208,28 +225,28 @@ var maborak = function(){
 		};
 		Function.prototype.isObject	= false;
 		Function.prototype.isArray	= false;
-		/*
+		/**
 		* Strip whitespaces from the beginning and end of String
 		* @return String with whitespaces stripped 
 		*/
 		String.prototype.trim = function(){
 			return( this.replace(new RegExp("^([\\s]+)|([\\s]+)$", "gm"), "") );
 		};
-		/*
+		/**
 		* Strip whitespaces from the beginning of String
 		* @return String
 		*/
 		String.prototype.leftTrim = function(){
 			return( this.replace(new RegExp("^[\\s]+", "gm"), "") );
 		};
-		/*
+		/**
 		* Strip whitespaces from the end of String
 		* @return String 
 		*/
 		String.prototype.rightTrim = function(){
 			return( this.replace(new RegExp("[\\s]+$", "gm"), "") );
 		};
-		/*
+		/**
 		* Strip HTML tags from a string
 		* @return String 
 		*/
@@ -237,7 +254,7 @@ var maborak = function(){
 		{
 			return this.replace(/<\/?[^>]+>/gi, '');
 		};
-		/*
+		/**
 		* Convert special characters to HTML entities
 		* @return String
 		*/
@@ -248,7 +265,7 @@ var maborak = function(){
 			div.appendChild(text);
 			return div.innerHTML;
 		};
-		/*
+		/**
 		* Convert special HTML entities back to characters
 		* @return String
 		*/
@@ -258,7 +275,7 @@ var maborak = function(){
 			div.innerHTML = this.trim();
 			return div.childNodes[0] ? div.childNodes[0].nodeValue : '';
 		};
-		/*
+		/**
 		* Search and Replace
 		* @return String
 		*/
@@ -269,7 +286,7 @@ var maborak = function(){
 			var re = new RegExp(search,"g");
 			return this.replace(re,replace);
 		};
-		/*
+		/**
 		* Camelize String (text-align -> textAlign)
 		* @return String
 		*/
@@ -287,7 +304,7 @@ var maborak = function(){
 		        }
 			return camelizedString;
 		};
-		/*
+		/**
 		* Convert String to Array
 		* @return Array
 		*/
@@ -296,7 +313,7 @@ var maborak = function(){
 			return this.split("");
 		};
 	};
-	/*
+	/**
 	* Load methods
 	* @param methods = Array[Method || Array[Method,[Argument1,Argument2,...],return]];
 	* @param instance= Class;
@@ -340,7 +357,7 @@ var maborak = function(){
 		}
 		return (_return_.length==1)?_return_[0]:_return_;
 	};
-	/*
+	/**
 	* Identify User-Agent of Browser
 	* @result
 	* 	isIE	= "Microsoft Internet Explorer"
@@ -363,6 +380,7 @@ var maborak = function(){
 			isGK:((userAgent.indexOf('Gecko')>=0)?true:false),
 			isOP:((userAgent.indexOf('Opera')>=0)?true:false)
 		};
+		this.browser.isIE=(this.browser.isOP)?false:true;
 		var checkFor=["MSIE","Netscape/6","Firefox","Safari","Gecko","Opera"];
 		for(var i=0;i<checkFor.length;i++)
 		{
@@ -370,7 +388,7 @@ var maborak = function(){
 			this.browser.version = userAgent+"::::"+userAgent.substr(j + checkFor[i].length);
 		}
 	};
-	/*
+	/**
 	* @class		 = Event manager
 	*/
 	this.mantis = function(parent)
@@ -382,11 +400,14 @@ var maborak = function(){
 			var i=0;
 			while (this.db.length > 0)
 			{
-				this.remove(this.db[0]._object_,this.db[0]._event_,this.db[0]._function_,this.db[0]._bumble_);
+				if(this.db[0] && this.db[0].isObject===true)
+				{
+					this.remove(this.db[0]._object_,this.db[0]._event_,this.db[0]._function_,this.db[0]._bumble_);
+				}
 				this.db.splice(0,1);
 			}
 		};
-		/*
+		/**
 		* Add new Event;
 		* @param _object_	= DOMelement;
 		* @param _event_	= event [load,focus,etc];
@@ -446,12 +467,12 @@ var maborak = function(){
 			this.db.push(event);
 			return (this.db.length-1);
 		};
-		/*
+		/**
 		* Remove Event;
-		* @param _object_	= DOMelement;
-		* @param _event_	= event [load,focus,etc];
-		* @param _function_ = Function || Object{method,instance,[arguments[Array],event[Boolean],argument_is_array[Boolean]]} || Function[virtual];
-		* @param _bumble_	= true || false;
+		* @param {DOM Object} _object_	= DOMelement;
+		* @param {event} _event_	= event [load,focus,etc];
+		* @param {Function} _function_ = Function || Object{method,instance,[arguments[Array],event[Boolean],argument_is_array[Boolean]]} || Function[virtual];
+		* @param {Boolean} _bumble_	= true || false;
 		* @example:
 		*		Add new Event Examples.
 		*/
@@ -479,10 +500,21 @@ var maborak = function(){
 				}
 			}			
 		};
-		/*
+		/**
+		* Flush Collection events from DB
+		* @param	{Array} arrayEventsInDB Array of Events.
+		*/
+		this.flushCollection=function(arrayEventsInDB)
+		{
+			var l=arrayEventsInDB.length;
+			for(i=0;i<l;i++)
+			{
+				this.remove(this.db[arrayEventsInDB[i]]._object_,this.db[arrayEventsInDB[i]]._event_,this.db[arrayEventsInDB[i]]._function_,this.db[arrayEventsInDB[i]]._bumble_,arrayEventsInDB[i]);
+			}
+		};
+		/**
 		* es| Reportar fallos en el registro de eventos
-		* @param	text = String;
-		* @access	Public;
+		* @param {String} text String;
 		*/
 		this.report=function(text)
 		{
@@ -491,7 +523,7 @@ var maborak = function(){
 				this.parent.report.add(text);
 			}
 		};
-		/*
+		/**
 		* Captura DOM event
 		* @param {Object} event
 		* @return DOM
@@ -500,7 +532,7 @@ var maborak = function(){
 		{
 			return event.target || window.event.srcElement;
 		};
-		/*
+		/**
 		* es| Arreglar fallo IE (sobreposición de eventos)
 		* @param {Object} event
 		*/
@@ -513,14 +545,14 @@ var maborak = function(){
 			event.returnValue = false;
 		};
 	};
-	/*
+	/**
 	* @class	= System report
 	* @access	= Public;
 	*/
 	this.bitacora=function()
 	{
 		this.db=[];
-		/*
+		/**
 		* @param	text = String;
 		* @access 	Public;
 		*/
@@ -529,7 +561,7 @@ var maborak = function(){
 			this.db.push(text);
 		};
 	};
-	/*
+	/**
 	* es| Objeto con bugs Crossbrowser.
 	* @access	= Public;
 	*/
@@ -542,7 +574,7 @@ var maborak = function(){
 			});
 		}
 	};
-	/*
+	/**
 	* es |  Ejecuta un método de forma encapsulada
 	*		especial para funciones en Objetos Literales
 	* @param _function_ = method
@@ -553,10 +585,10 @@ var maborak = function(){
 	*/
 	this.exec=function(_function_,_arguments_,_return_,_instance_)
 	{
-		/*return ((_instance_)?_instance_:this).loadMethods([[_function_,((_arguments_)?_arguments_:null),_return_ || false]],((_instance_)?_instance_:this));*/
+		/**return ((_instance_)?_instance_:this).loadMethods([[_function_,((_arguments_)?_arguments_:null),_return_ || false]],((_instance_)?_instance_:this));*/
 		return this.loadMethods([[_function_,((_arguments_)?_arguments_:null),_return_ || false]],((_instance_)?_instance_:this));
 	};
-	/*
+	/**
 	* es|  Crear funciones virtuales
 	* @param {Object} options = {
 	*		method	:Method,
@@ -586,13 +618,18 @@ var maborak = function(){
 		var args	=(options.args || (typeof options.args=="number" && options.args===0))?options.args:false;
 		var _function=options.Function || false;
 		var isArr	=options.args_is_array || false;
-		var event	=options.event || false;
-		return function(h)
+		var _event	=options.event || false;
+		return function(hEvent)
 		{
-			var argss=(args===false)?false:((args.isArray && isArr===false)?args:[args]);			
-			var param=(event)?[h].concat(argss):argss;
+			//window.status="EEE=> "+(h || window.event);
+			var argss=(args===false)?false:((args.isArray && isArr===false)?args:[args]);
+			//window.status = typeof _event+":"+hEvent+":"+_event;
+			//window.status = args;
+
+			var param=(_event)?[(hEvent || window.event)].concat(argss):argss;
 			if(_function===false)
 			{
+				//window.status="EventHandler:=> "+param;
 				method.apply(instance,param || [null]);
 			}
 			else
@@ -601,7 +638,7 @@ var maborak = function(){
 			}
 		};
 	};
-	/*
+	/**
 	* es| Clase para cargar archivos,módulos,objetos
 	*
 	* @class			= Package Manager;
@@ -613,7 +650,7 @@ var maborak = function(){
 	{
 		this.parent	= parent || false;
 		this.db		= db || false;
-		/*
+		/**
 		* Load new Package
 		*/
 		this.Load	= function(file,options)
@@ -629,8 +666,9 @@ var maborak = function(){
 					this.src	=	this.source();
 					var script 	= 	document.createElement("script");
 					this.parent.tools.head().appendChild(script);
-					script.src	=	this.src;
+					script.src	=	this.src+"?d="+Math.random();
 					script.type	=	"text/javascript";
+					script.charset	=	this.parent.charset;
 					if(this.type=="module"){this.write(script);}
 				}
 			}
@@ -642,7 +680,7 @@ var maborak = function(){
 			delete this.type;
 			delete this.src;
 		};
-		/*
+		/**
 		* es| Obtener la ruta del archivo,modulo a cargar
 		*
 		* @access	= Private;
@@ -659,7 +697,7 @@ var maborak = function(){
 				return nroute;
 			}
 		};
-		/*
+		/**
 		* Probe conditions
 		*
 		* @access	= Private;
@@ -691,7 +729,7 @@ var maborak = function(){
 				return false;
 			}
 		};
-		/*
+		/**
 		* Prevent duplicate
 		*
 		* @access	= Private;
@@ -725,7 +763,7 @@ var maborak = function(){
 						return true;
 					}
 				}
-				eval("this.Class.module."+this.name+"=true;");
+				this.Class.module[this.name]=true;
 				return false;
 			}
 			else if(this.type=="file")
@@ -760,14 +798,14 @@ var maborak = function(){
 			}
 			else
 			{
-				eval("this.tmpPgk=this._file_.Class.module."+Package.info.Name);
+				this.tmpPgk=this._file_.Class.module[Package.info.Name];
 				if(this.tmpPgk===true)
 				{
 					if(typeof Package.content=="function")
 					{
 						Package.content.prototype.parent=this._file_.Class;
 					}
-					eval("this._file_.Class.module."+Package.info.Name+"=Package.content;");
+					this._file_.Class.module[Package.info.Name]=Package.content;
 					for(i=this._file_._Package_.length;i>0;i--)
 					{
 						var nm=this._file_._Package_[this._file_._Package_.length-i];
@@ -776,7 +814,7 @@ var maborak = function(){
 							nm.loaded=true;
 							if(!this.parent.browser.isIE)
 							{
-								this.parent.tools.removeElement(nm.script);
+								this.parent.dom.remove(nm.script);
 							}
 							delete nm.script;
 							if(nm.onLoad)
@@ -803,7 +841,7 @@ maborak.prototype={
 		name	:"maborak",
 		file	:"maborak.js"
 	},
-	/*
+	/**
 	* Make this Class
 	* @param options = Object{Options.for.class} || {};
 	* @access		 = Public;
@@ -859,31 +897,20 @@ maborak.prototype={
 			this.head=function()
 			{
 				return document.getElementsByTagName("HTML")[0].getElementsByTagName("HEAD")[0];
-			};
-			this.removeElement=function(elemID){
-				var elem = (typeof elemID == "string")?document.getElementById(elemID):elemID;
-				if(elem.parentNode)
-				{
-					elem.parentNode.removeChild(elem);
-				}
-				else if(elem.parentElement)
-				{
-					elem.parentElement.removeChild(elem);
-				}
-			};
+			};			
 			this.createUID=function()
 			{
 				return Math.random();
-			}
+			};
 		},
-		/*
+		/**
 		* @class Manage DOM elements
 		* @param {Object} parent Leimnud instance
 		*/
 		D0M:function(parent)
 		{
 			this.parent = parent || {};
-			/*
+			/**
 			* Capture DOM object from (String || DOM element)
 			* @param {string || object} element String.id || DOM object 
 			* @return DOM object 
@@ -892,16 +919,41 @@ maborak.prototype={
 			{
 				return (!element)?false:((typeof element=="object")?element:((document.getElementById(element))?document.getElementById(element):false));
 			};
-			/*
+			/**
+			* Remove Elements
+			* @param {DOM || Array.DOM} DOM Elements
+			*/
+			this.remove=function(DOM){
+				DOM = (DOM.isArray || (DOM.isObject && !DOM.appendChild))?DOM:[DOM];
+				for(var i in DOM)
+				{
+					if(DOM.propertyIsEnumerable(i))
+					{
+						if(DOM[i].isObject && !DOM[i].appendChild)
+						{
+							this.remove(DOM[i]);
+						}
+						else
+						{
+							var element=this.element(DOM[i]);
+							if(element && element.parentNode)
+							{
+								element.parentNode.removeChild(element);
+							}
+						}
+					}
+				}
+			};
+			/**
 			* Automate DOM || HTMLCollection => ArrayDOMCollection
 			* @param {string || DOM} DOM DOM || HTMLCollection
 			* @param {Array} style ArrayDOMCollection
 			*/
 			this.automateDOMToCollection = function(DOM)
 			{
-				return ((!DOM.isArray && (DOM.isObject || (this.parent.browser.isIE && !DOM.isObject))) || DOM.isArray)?DOM:[DOM]
+				return ((!DOM.isArray && (DOM.isObject || (this.parent.browser.isIE && !DOM.isObject))) || DOM.isArray)?DOM:[DOM];
 			};
-			/*
+			/**
 			* Apply styles to DOM object
 			* @param {string || DOM} DOM String.id || DOM object 
 			* @param {object} style es| Objeto con valores de estilo 
@@ -924,7 +976,7 @@ maborak.prototype={
 					}
 				}
 			};
-			/*
+			/**
 			* Get styles from DOM object
 			* @param {string || DOM} DOM String.id || DOM object 
 			* @param {object} style Propertie to get 
@@ -952,15 +1004,15 @@ maborak.prototype={
 					rs.push((value == 'auto')?null:value);
 				}
 				return (rs.length<2)?rs[0]:rs;
-				/*//if (window.opera && ['left', 'top', 'right', 'bottom'].include(style))
-				//{
-				//	if (this.getStyle(element, 'position') == 'static')
-				//	{
-				//		value = 'auto';
-				//	};
-				//}*/
+				/**if (window.opera && ['left', 'top', 'right', 'bottom'].include(style))
+				{
+					if (this.getStyle(element, 'position') == 'static')
+					{
+						value = 'auto';
+					};
+				}*/
 			};
-			/*
+			/**
 			* es| Capturar coordenadas X,Y de un elemento DOM
 			* @param {String || DOM} DOM String.id || DOM object 
 			* @param {Boolean} Final Return coordinates x2,y2
@@ -969,17 +1021,17 @@ maborak.prototype={
 			this.position=function(DOM,Final)
 			{
 				DOM = this.element(DOM);
-				var initial = DOM;
+				var position,initial = DOM;
 				if(this.parent.dom.getStyle(DOM,"position")=="absolute")
 				{
-					var position={
+					position={
 						x:parseInt(this.parent.dom.getStyle(DOM,"left"),10),
 						y:parseInt(this.parent.dom.getStyle(DOM,"top"),10)
 					};
 				}
 				else
 				{					
-					var position={
+					position={
 						x:0,
 						y:0
 					};
@@ -994,24 +1046,7 @@ maborak.prototype={
 				}
 				return (Final===true)?{x:(position.x+parseInt(initial.offsetWidth,10)),y:(position.y+parseInt(initial.offsetHeight,10))}:position;
 			};
-			/*
-			* Array Collection to HtmlCollection
-			* @param {Array} arrayCollection Array with UID's DOM
-			* @return {Array} HtmlCollection; 
-			*/
-			this.CollectionToArray = function(arrayCollection)
-			{
-				var r=[];
-				for(var i=0;i<arrayCollection.length;i++)
-				{
-					if(document.getElementById(arrayCollection[i]))
-					{
-						r.push(document.getElementById(arrayCollection[i]));
-					}
-				}
-				return r;
-			};
-			/*
+			/**
 			* Transform HTMLCollection to ArrayCollection
 			* @param {HTMLCOLLECTION} Collection Html Collection
 			* @return {Array} Array Collection; 
@@ -1025,8 +1060,7 @@ maborak.prototype={
 				}
 				return r;
 			};
-			/*;
-			/*
+			/**
 			* Coordinates x,y Mouse
 			* @param {Event} event Event
 			* @return {Object} position Coordinates x,y 
@@ -1034,11 +1068,11 @@ maborak.prototype={
 			this.mouse = function(event)
 			{
 				return {
-						x:(this.parent.browser.isIE)?(window.event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft):(event.clientX + window.scrollX),
-						y:(this.parent.browser.isIE)?(window.event.clientY + document.documentElement.scrollTop + document.body.scrollTop):(event.clientY + window.scrollY)
+						x:(this.parent.browser.isIE)?(window.event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft):(event.clientX + (window.scrollX || document.body.scrollLeft || 0)),
+						y:(this.parent.browser.isIE)?(window.event.clientY + document.documentElement.scrollTop + document.body.scrollTop):(event.clientY + (window.scrollY || document.body.scrollTop ||0))
 					};
 			};
-			/*
+			/**
 			* DOM elements, range positions
 			* @param {DOM || Array[DOM]} DOM Elements
 			* @return {Object} position Coordinates x1:y1,x2:y2 
@@ -1058,7 +1092,7 @@ maborak.prototype={
 				}
 				return r;
 			};
-			/*
+			/**
 			* Capture DOM Element
 			* @param {String} DOMstring Object to Search [(id|name|tag).(id|name|tag) (Index=0)]
 			* @return Object HEAD
