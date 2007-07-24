@@ -1,3 +1,22 @@
+/***************************************************************************
+*     				  		  module.drag.js
+*                        ------------------------
+*   Copyleft	: (c) 2007 maborak.com <maborak@maborak.com>
+*   Version		: 0.2
+*
+***************************************************************************/
+
+/***************************************************************************
+*
+*   This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation; either version 2 of the License, or
+*   (at your option) any later version.
+*
+***************************************************************************/
+/**
+* @class drag
+*/
 leimnud.Package.Public({
 	info	:{
 		Class	:"maborak",
@@ -8,15 +27,19 @@ leimnud.Package.Public({
 	},
 	content	:function(options){
 		this.options	= options || {};
-		this.loaded	= false;
+		this.loaded		= false;
 		this.eventHandlers=[];
-		this.cursor = "move";
-		this.uid	= this.parent.tools.createUID();
+		this.cursor 	= "move";
+		this.uid		= this.parent.tools.createUID();
 		this.make=function()
 		{
 			//alert(this.options.elements.isArray);
 			//this.options.elements=(this.options.elements && !this.options.elements.length)?[this.options.elements]:this.options.elements
 			this.options.elements=this.set();
+			this.options.fx = {
+				type:"simple",
+				target:document.body
+			}.concat(this.options.fx || {});
 			this.events =this.events || {};
 			//alert(this.options.elements.length);
 			var elements=(this.options.elements || []).length;
@@ -24,19 +47,19 @@ leimnud.Package.Public({
 			var oThis = this;
 			for(var i=0;i<elements;i++)
 			{
-				
-				var revent=this.parent.event.add(this.options.elements[i],"mousedown",this.parent.execHandler({
-					method:this.onInit,
+
+				var revent=this.parent.event.add(this.options.elements[i],"mousedown",this.parent.closure({
+					method	:this.onInit,
 					instance:this,
-					event:true,
-					args:[i,this.options.elements[i]]
+					event	:true,
+					args	:[i]
 				}),false);
 				/*var oj=this.options.elements[i];
 				var revent = this.parent.event.add(this.options.elements[i],"mousedown",function(rrr){
-					oThis.onInit(rrr || window.event,i,oj);
+				oThis.onInit(rrr || window.event,i,oj);
 				},false);*/
 
-				//this.flagEvents.push(revent);
+				this.flagEvents.push(revent);
 				//this.parent.event.add(this.options.elements[i],"mousedown",x,false);
 			}
 			//alert(5);
@@ -45,7 +68,7 @@ leimnud.Package.Public({
 		{
 			if(this.options.elements)
 			{
-				this.type="simple";				
+				this.type="simple";
 				/*return ((!this.options.elements.isArray && (this.options.elements.isObject || (this.parent.browser.isIE && !this.options.elements.isObject))) || this.options.elements.isArray)?this.options.elements:[this.options.elements];*/
 				return (this.options.elements.isArray)?this.options.elements:[this.options.elements];
 			}
@@ -67,28 +90,60 @@ leimnud.Package.Public({
 				return [];
 			}
 		};
-		this.onInit=function(fEvent,elNum,elem)
+		this.onInit=function(fEvent,elNum)
 		{
 			//window.status="onInit:=> "+arguments.length+":::"+event+":"+elNum+":"+elem;
 			//window.status="onInit:=> "+arguments.length+":"+arguments[0]+":"+arguments[1]+":"+arguments[2];
-			if(arguments.length<3 && this.parent.browser.isIE)
+			if(arguments.length<2 && this.parent.browser.isIE)
 			{
-				elem=elNum;
-				elNum=fEvent;
-				fEvent=window.event;
+				//element	= this.options.elements[elNum];
+				elNum	= fEvent;
+				fEvent	= window.event;
 			}
-			window.status="onInit:=> "+fEvent+":"+elNum+":"+elem;
-			
-			var position,element	=elem;
-			this.cursorStart	=this.parent.dom.mouse(fEvent);
-		//	window.status=this.cursorStart.toStr()
+			//window.status="onInit:=> "+fEvent+":"+elNum+":"+elem;
+			//window.status=elNum+":"+element;
+			this.currentElementInArray=elNum;
+			var element=this.options.elements[elNum];
+			this.currentElementDrag = element;
+			var position;
+			this.cursorStart	= this.parent.dom.mouse(fEvent);
+			//	window.status=this.cursorStart.toStr()
 			if(this.type=="simple")
 			{
-				this.probeAbsolute(element);
-				this.elementStart	={
-					x:parseInt(this.parent.dom.getStyle(element,"left"),10),
-					y:parseInt(this.parent.dom.getStyle(element,"top"),10)
-				};
+				if(this.options.fx.type=="simple")
+				{
+					this.probeAbsolute(element);
+					this.elementStart	={
+						x:parseInt(this.parent.dom.getStyle(element,"left"),10),
+						y:parseInt(this.parent.dom.getStyle(element,"top"),10)
+					};
+				}
+				else if(this.options.fx.type=="clone")
+				{
+					var ps = this.parent.dom.position(element);
+					//window.status=ps.x+":"+ps.y;
+					var clo = element.cloneNode(true);
+					this.currentElementDrag = clo;
+					var ev = this.parent.event.db[this.flagEvents[elNum]];
+					this.parent.event.remove(clo,ev._event_,ev._function_);
+					this.options.fx.target.appendChild(clo);
+					var pst = this.parent.dom.position(this.options.fx.target);
+					
+					
+					this.parent.dom.setStyle(clo,{
+						position:"absolute",
+						left:(ps.x-(pst.x+4))+(this.options.fx.target.scrollLeft || 0),
+						top:(ps.y-(pst.y+4))+(this.options.fx.target.scrollTop || 0),
+						zIndex:this.options.fx.zIndex || 1000
+					});
+					this.elementStart	={
+						x:parseInt(this.parent.dom.getStyle(clo,"left"),10),
+						y:parseInt(this.parent.dom.getStyle(clo,"top"),10)
+					};
+					element = clo;
+					this.parent.dom.opacity(clo,33);
+					//alert(element+":"+ps.x+":"+ps.y);
+				}
 				//alert(this.parent.dom.getStyle(element,"z-index"));
 			}
 			else if(this.type=="group")
@@ -97,7 +152,7 @@ leimnud.Package.Public({
 				this.elementStart=[];
 				for(var i=0;i<this.options.elements.length;i++)
 				{
-					position = this.parent.dom.position(this.options.elements[i]);
+					position = this.parent.dom.position(this.options.elements[i],false,true);
 					this.elementStart[i]={
 						x:position.x,
 						y:position.y
@@ -111,7 +166,7 @@ leimnud.Package.Public({
 				this.elementStart=[];
 				for(i=0;i<this.linkRef.length;i++)
 				{
-					position = this.parent.dom.position(this.linkRef[i]);
+					position = this.parent.dom.position(this.linkRef[i],false,true);
 					this.elementStart[i]={
 						x:position.x,
 						y:position.y
@@ -119,18 +174,18 @@ leimnud.Package.Public({
 				}
 				this.absolutizeLink();
 			}
-			this.parent.event.add(document,"mousemove",this.parent.execHandler({
-					method:this.onMove,
-					instance:this,
-					event:true,
-					args:[elNum,element,this.parent.event.db.length]
+			this.parent.event.add(document,"mousemove",this.parent.closure({
+				method:this.onMove,
+				instance:this,
+				event:true,
+				args:[elNum,element,this.parent.event.db.length]
 			}),true);
 			//window.status=this.parent.event.db.length;
-			this.parent.event.add(document,"mouseup",this.parent.execHandler({
-					method:this.onFinish,
-					instance:this,
-					event:true,
-					args:[elNum,element,this.parent.event.db.length]
+			this.parent.event.add(document,"mouseup",this.parent.closure({
+				method:this.onFinish,
+				instance:this,
+				event:true,
+				args:[elNum,element,this.parent.event.db.length]
 			}),true);
 			if(window.event)
 			{
@@ -145,16 +200,39 @@ leimnud.Package.Public({
 		};
 		this.onMove=function(event,elNum,element)
 		{
+			//window.status=elNum+":"+element;
 			//window.status="Mouse:"+this.parent.dom.mouse(event).toStr()+"__Element:"+this.parent.dom.position(element).toStr()+"__Range:"+this.parent.dom.positionRange(element).toStr();
-			var cursor =this.parent.dom.mouse(event);
+			var cursor =this.parent.dom.mouse(event),rG,tL,tT;
 			if(this.type=="simple")
 			{
 				//window.status=this.parent.dom.mouse(event).toStr();//var element=this.parent.event.dom(event);
 				//window.status=event+":"+element.style.left+":"+element.style.top+"::"+element;
-				this.parent.dom.setStyle(element,{
-					left:this.elementStart.x+(cursor.x-this.cursorStart.x),
-					top:this.elementStart.y+(cursor.y-this.cursorStart.y)
-				});
+				/*this.parent.dom.setStyle(element,{
+				left:this.elementStart.x+(cursor.x-this.cursorStart.x),
+				top:this.elementStart.y+(cursor.y-this.cursorStart.y)
+				});*/
+				rG={
+					l:true,
+					t:true
+				};
+				tL=parseInt(this.elementStart.x+(cursor.x-this.cursorStart.x),10);
+				tT=parseInt(this.elementStart.y+(cursor.y-this.cursorStart.y),10);
+				if(tL<0 || this.options.limit==="x"){rG.l=false;}
+				if(tT<0 || this.options.limit==="y"){rG.t=false;}
+				//var tL=parseInt(this.elementStart.x+(cursor.x-this.cursorStart.x),10);
+				//var tT=parseInt(this.elementStart.y+(cursor.y-this.cursorStart.y),10);
+				if(rG.l || !this.options.limit)
+				{
+					this.parent.dom.setStyle(element,{
+						left:tL
+					});
+				}
+				if(rG.t || !this.options.limit)
+				{
+					this.parent.dom.setStyle(element,{
+						top:tT
+					});
+				}
 			}
 			else if(this.type=="group")
 			{
@@ -167,14 +245,50 @@ leimnud.Package.Public({
 				}
 			}
 			else if(this.type=="link")
-			{				
-				for(i=0;i<this.linkRef.length;i++)
+			{
+				if(this.options.limit===true)
 				{
-					//window.status=this.elementStart[i].x+(cursor.x-this.cursorStart.x);
-					this.parent.dom.setStyle(this.linkRef[i],{
-						left:this.elementStart[i].x+(cursor.x-this.cursorStart.x),
-						top:this.elementStart[i].y+(cursor.y-this.cursorStart.y)
-					});
+					var rng=this.parent.dom.positionRange(this.linkRef,false,true);
+					rG={
+						l:true,
+						t:true
+					};
+					for(i=0;i<this.linkRef.length;i++)
+					{
+						tL=parseInt(this.elementStart[i].x+(cursor.x-this.cursorStart.x),10);
+						tT=parseInt(this.elementStart[i].y+(cursor.y-this.cursorStart.y),10);
+						if(tL<0){rG.l=false;}
+						if(tT<0){rG.t=false;}
+					}
+					for(i=0;i<this.linkRef.length;i++)
+					{
+						tL=parseInt(this.elementStart[i].x+(cursor.x-this.cursorStart.x),10);
+						tT=parseInt(this.elementStart[i].y+(cursor.y-this.cursorStart.y),10);
+						if(rG.l)
+						{
+							this.parent.dom.setStyle(this.linkRef[i],{
+								left:tL
+							});
+						}
+						if(rG.t)
+						{
+							this.parent.dom.setStyle(this.linkRef[i],{
+								top:tT
+							});
+						}
+					}
+				}
+				else
+				{
+					for(i=0;i<this.linkRef.length;i++)
+					{
+						tL=parseInt(this.elementStart[i].x+(cursor.x-this.cursorStart.x),10);
+						tT=parseInt(this.elementStart[i].y+(cursor.y-this.cursorStart.y),10);
+						this.parent.dom.setStyle(this.linkRef[i],{
+							left:tL,
+							top:tT
+						});
+					}
 				}
 			}
 			if(window.event)
@@ -192,14 +306,15 @@ leimnud.Package.Public({
 		};
 		this.onFinish=function(event,elNum,element,hand)
 		{
+			//window.status=elNum+":"+element;
 			if(arguments.length<4 && this.parent.browser.isIE)
 			{
-				hand=element;
-				element=elNum;
-				elNum=event;
-				event=window.event;
+				hand	= element;
+				element	= elNum;
+				elNum	= event;
+				event	= window.event;
 			}
-			window.status="Finish=> "+event+":"+elNum+":"+element+":"+hand;
+			//window.status="Finish=> "+event+":"+elNum+":"+element+":"+hand;
 			//alert(this.parent.event.db[hand].toStr());
 			//var handler = this.parent.event.db[hand]._function_;
 			this.launchEvents(this.events.finish);
@@ -213,31 +328,32 @@ leimnud.Package.Public({
 		};
 		this.probeAbsolute=function(d0m)
 		{
-				if(this.parent.dom.getStyle(d0m,"position")!="absolute")
-				{
-					var position=this.parent.dom.position(d0m);
-					this.parent.dom.setStyle(d0m,{
-							position:'absolute',
-							left	:position.x,
-							top		:position.y,
-							cursor	:this.cursor
-						});
-				}
+			if(this.parent.dom.getStyle(d0m,"position")!="absolute")
+			{
+				var position=this.parent.dom.position(d0m,false,true);
+				//alert(position.x+":"+position.y)
+				this.parent.dom.setStyle(d0m,{
+					position:'absolute',
+					left	:position.x,
+					top		:position.y,
+					cursor	:this.cursor
+				});
+			}
 		};
 		this.absolutizeGroup=function()
 		{
-				for(var i=0;i<this.options.elements.length;i++)
+			for(var i=0;i<this.options.elements.length;i++)
+			{
+				if(this.parent.dom.getStyle(this.options.elements[i],"position")!="absolute")
 				{
-					if(this.parent.dom.getStyle(this.options.elements[i],"position")!="absolute")
-					{
-						this.parent.dom.setStyle(this.options.elements[i],{
-							position:'absolute',
-							left	:this.elementStart[i].x,
-							top		:this.elementStart[i].y,
-							cursor	:this.cursor
-						});
-					}
+					this.parent.dom.setStyle(this.options.elements[i],{
+						position:'absolute',
+						left	:this.elementStart[i].x,
+						top		:this.elementStart[i].y,
+						cursor	:this.cursor
+					});
 				}
+			}
 		};
 		this.absolutizeLink=function()
 		{

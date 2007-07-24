@@ -21,6 +21,7 @@ leimnud.Package.Public({
 		this.setStyle	= {};
 		this.events	= {};
 		this.tab	= {};
+		this.showing	= {};
 		this.make=function()
 		{
 			this.makeTmpDB();
@@ -124,15 +125,27 @@ leimnud.Package.Public({
 			this.elements.statusBar = document.createElement("div");
 			this.elements.statusBar.className="panel_statusBar";
 			this.parent.exec(this.styles.statusBar,false,false,this);
-			if(this.options.statusBar)
-			{
-				this.elements.frontend.appendChild(this.elements.statusBar);
-			}
+			this.elements.frontend.appendChild(this.elements.statusBar);
 			/**
 			*
 			* statusBar End
 			*
 			*/
+			/**
+			*
+			* status Begin
+			*
+			*/
+			this.elements.status = document.createElement("div");
+			this.elements.status.className="panel_status";
+			this.parent.exec(this.styles.status,false,false,this);
+			this.elements.statusBar.appendChild(this.elements.status);
+			/**
+			*
+			* status End
+			*
+			*/
+
 			/* Height Content Fix*/
 			this.parent.exec(this.styles.tab,false,false,this);
 			this.parent.exec(this.styles.content,false,false,this);
@@ -210,7 +223,7 @@ leimnud.Package.Public({
 			* theme Begin
 			*
 			*/
-			this.makeTheme();
+			//this.makeTheme();
 			/**
 			*
 			* theme End
@@ -238,33 +251,34 @@ leimnud.Package.Public({
 			}
 			if(this.options.fx.blinkToFront===true)
 			{
-				this.events.init.push(this.parent.execHandler({
-					method:function(){
-						if(this.zIndex<this.parent.tmp.panel.zIndex)
-						{
-							this.zIndex=this.makezIndex();
-							this.parent.dom.setStyle(this.elements.containerWindow,{
-								zIndex:this.zIndex
-							});
-							if(this.options.fx.shadow)
-							{
-								this.shadowReIndex();
-							}
-						}
-					},
+				this.events.init.push(this.parent.closure({
+					method:this.blink,
 					instance:this
 				}));
 			}
 			if(this.options.fx.opacity)
 			{
-				this.events.init.push(this.parent.execHandler({
+				this.events.init.push(this.parent.closure({
 					method:this.fx.setOpacity,
 					instance:this
 				}));
-				this.events.finish.push(this.parent.execHandler({
+				this.events.finish.push(this.parent.closure({
 					method:this.fx.unsetOpacity,
 					instance:this
 				}));
+			}
+		};
+		this.blink=function(){
+			if(this.zIndex<this.parent.tmp.panel.zIndex)
+			{
+				this.zIndex=this.makezIndex();
+				this.parent.dom.setStyle(this.elements.containerWindow,{
+					zIndex:this.zIndex
+				});
+				if(this.options.fx.shadow)
+				{
+					this.shadowReIndex();
+				}
 			}
 		};
 		/**
@@ -307,13 +321,14 @@ leimnud.Package.Public({
 					link:{
 						elements:[this.elements.title],
 						ref:((this.options.fx.shadow===true)?[this.elements.containerWindow,this.elements.shadow]:[this.elements.containerWindow])
-					}
+					},
+					limit:this.options.limit || false
 				});
 				this.drag.events={
 					init	:this.events.init,
 					move	:this.events.move,
 					finish	:this.events.finish
-				}
+				};
 				this.drag.make();
 			}
 		};
@@ -328,7 +343,7 @@ leimnud.Package.Public({
 			this.clearContent();
 			//alert(parseInt(this.parent.dom.getStyle(tb,"width")));
 			this.parent.dom.setStyle(tb,{
-				width:parseInt(this.parent.dom.getStyle(tb,"width"))-((!this.parent.browser.isIE)?3:0),
+				width:parseInt(this.parent.dom.getStyle(tb,"width"),10)-((!this.parent.browser.isIE)?3:0),
 				borderLeftWidth:4
 			});
 			tb.onmouseup=function(){return false;};
@@ -347,13 +362,13 @@ leimnud.Package.Public({
 				tls.onmouseover=function(){this.className="panel_tabOptionOver";};
 				tls.onmouseout=function(){this.className="panel_tabOption";};
 				this.parent.dom.setStyle(tls,this.setStyle.tabOption || {});
-				tls.onmouseup=this.parent.execHandler({
+				tls.onmouseup=this.parent.closure({
 					instance:this,
 					method:function(tabID){this.tabSelected=tabID;this.makeTab();return false;},
 					args:this.tabLastSelected
 				});
 				this.parent.dom.setStyle(tls,{
-					width:parseInt(this.parent.dom.getStyle(tb,"width"))+((!this.parent.browser.isIE)?3:0),
+					width:parseInt(this.parent.dom.getStyle(tb,"width"),10)+((!this.parent.browser.isIE)?3:0),
 					borderLeftWidth:1
 				});
 				//this.tabSelected
@@ -390,7 +405,7 @@ leimnud.Package.Public({
 		};
 		this.target=function()
 		{
-			return (this.options.target)?this.oprions.target:this.parent.dom.capture("tag.body 0");
+			return (this.options.target)?this.options.target:this.parent.dom.capture("tag.body 0");
 		};
 		/**
 		*
@@ -414,7 +429,7 @@ leimnud.Package.Public({
 		};
 		this.remove=function()
 		{
-			//this.drag.flush();
+			this.drag.flush();
 			for(var i in this.elements)
 			{
 				if(this.elements.propertyIsEnumerable(i))
@@ -439,7 +454,7 @@ leimnud.Package.Public({
 			}
 			else if(typeof content=="object")
 			{
-				this.elements.appendChild(content);
+				this.elements.content.appendChild(content);
 				//alert(this.elements.content.clientHeight)
 				return true;
 			}
@@ -448,6 +463,27 @@ leimnud.Package.Public({
 		this.clearContent=function()
 		{
 			this.elements.content.innerHTML="";
+		};
+		this.addContentStatus=function(content)
+		{
+			if(!this.showing.status){
+				this.command(this.status.show);
+			}
+			if(typeof content=="string")
+			{
+				this.elements.status.innerHTML=content;
+				return true;
+			}
+			else if(typeof content=="object")
+			{
+				this.elements.status.appendChild(content);
+				return true;
+			}
+			return false;
+		};
+		this.clearContentStatud=function()
+		{
+			this.elements.status.innerHTML="";
 		};
 		this.fx={
 			setOpacity:function()
@@ -483,8 +519,31 @@ leimnud.Package.Public({
 			{
 				this.options.size.w 	= this.options.size.w || 200;
 				this.options.size.h 	= this.options.size.h || 200;
-				this.options.position.x = ((this.options.position.center===true)?(((document.body.clientWidth/2)+document.body.scrollLeft)-(this.options.size.w/2)):(this.options.position.x || 0));
-				this.options.position.y = ((this.options.position.center===true)?(((document.body.clientHeight/2)+document.body.scrollTop)-(this.options.size.h/2)):(this.options.position.y || 0));
+
+				this.center		= {
+					x:(((this.target().clientWidth/2)+this.target().scrollLeft)-(this.options.size.w/2)),
+					y:(((this.target().clientHeight/2)+this.target().scrollTop)-(this.options.size.h/2))
+				};
+				if(this.options.position.center===true)
+				{
+					this.options.position.x = this.center.x;
+					this.options.position.y = this.center.y;
+				}
+				else if(this.options.position.centerX===true || this.options.position.centerY===true)
+				{
+					this.options.position.x = ((this.options.position.centerX===true)?this.center.x:(this.options.position.x || 0));
+					this.options.position.y = ((this.options.position.centerY===true)?this.center.y:(this.options.position.y || 0));
+				}
+				else
+				{
+					this.options.position.x = this.options.position.x || 0;
+					this.options.position.y = this.options.position.y || 0;
+				}
+
+				this.options.position.x = (this.options.position.x<0)?0:this.options.position.x;
+				this.options.position.y = (this.options.position.y<0)?0:this.options.position.y;
+
+
 				this.zIndex		= this.options.zIndex || this.makezIndex();
 				this.parent.dom.setStyle(this.elements.containerWindow,{
 					width:this.options.size.w,
@@ -548,6 +607,11 @@ leimnud.Package.Public({
 					//position:"relative",
 					//height:20,
 					//overflow:"hidden"
+					background:"url("+this.parent.info.base+"images/panel.bg.title.gif)",
+					backgroundColor:"white",
+					backgroundRepeat:"repeat-x",
+					borderBottom:"1px solid #DBE0E5"
+
 				});
 				this.parent.dom.setStyle(this.elements.titleBar,this.setStyle.titleBar || {});
 			},
@@ -596,29 +660,29 @@ leimnud.Package.Public({
 					//zIndex	:2
 				});
 				this.parent.dom.setStyle(this.elements.close,this.setStyle.close || {});
-				/*this.elements.close.onmouseover=this.parent.execHandler({
-					method:function(){
-						this.parent.dom.setStyle(this.elements.close,{
-							background:"url("+this.parent.info.base+"images/panel.close.over.gif)",
-							cursor:"pointer"
-						});
-					},
-					instance:this
+				/*this.elements.close.onmouseover=this.parent.closure({
+				method:function(){
+				this.parent.dom.setStyle(this.elements.close,{
+				background:"url("+this.parent.info.base+"images/panel.close.over.gif)",
+				cursor:"pointer"
 				});
-				this.elements.close.onmouseout=this.parent.execHandler({
-					method:function(){
-						this.parent.dom.setStyle(this.elements.close,{
-							background:"url("+this.parent.info.base+"images/panel.close.static.gif)",
-							cursor	:"pointer"
-						});
-					},
-					instance:this
+				},
+				instance:this
+				});
+				this.elements.close.onmouseout=this.parent.closure({
+				method:function(){
+				this.parent.dom.setStyle(this.elements.close,{
+				background:"url("+this.parent.info.base+"images/panel.close.static.gif)",
+				cursor	:"pointer"
+				});
+				},
+				instance:this
 				});*/
-				/*this.elements.close.onmouseup=this.parent.execHandler({
-					method:this.remove,
-					instance:this
+				/*this.elements.close.onmouseup=this.parent.closure({
+				method:this.remove,
+				instance:this
 				});*/
-				this.parent.event.add(this.elements.close,"mouseup",this.parent.execHandler({
+				this.parent.event.add(this.elements.close,"mouseup",this.parent.closure({
 					method:this.remove,
 					instance:this
 				}),false);
@@ -697,10 +761,10 @@ leimnud.Package.Public({
 						else
 						{
 							tb.className="panel_tabOption";
-							tb.onmouseover=function(){this.className="panel_tabOptionOver";};
-							tb.onmouseout=function(){this.className="panel_tabOption";};
+							tb.onmouseover=function(){/*this.className="panel_tabOptionOver";*/};
+							tb.onmouseout=function(){/*this.className="panel_tabOption";*/};
 							this.parent.dom.setStyle(tb,this.setStyle.tabOption || {});
-							tb.onmouseup=this.parent.execHandler({
+							tb.onmouseup=this.parent.closure({
 								instance:this,
 								method:function(tabID){this.tabSelected=tabID;this.makeTab();return false;},
 								args:i
@@ -719,13 +783,13 @@ leimnud.Package.Public({
 				//alert(heightContent);
 				var mgLeft = ((this.tab.options)?parseInt(this.parent.dom.getStyle(this.elements.tab,"width"),10):4);
 				this.parent.dom.setStyle(this.elements.content,{
-					//position:"relative",
+					background:"",
 					//color:"black",
 					//font:"normal 8pt Tahoma,MiscFixed",
 					//textAlign:"justify",
 					padding:5,
 					//border:"1px solid #A3A2BC",
-					//overflow:"auto",
+					//overflow:"scroll",
 					margin:4,
 					marginLeft:mgLeft
 					//marginLeft:4
@@ -749,10 +813,31 @@ leimnud.Package.Public({
 					//font	:"normal 0pt tahoma",
 					//padding	:0,
 					//margin	:0,
-					//borderTop:"1px solid #A3A2BC",
-					//height	:20
+					//borderTop:"0px solid #A3A2BC",
+					//height	:0
 				});
 				this.parent.dom.setStyle(this.elements.statusBar,this.setStyle.statusBar || {});
+				if(!this.options.statusBar)
+				{
+					this.showing.status=false;
+					this.parent.dom.setStyle(this.elements.statusBar,{
+						display:"none"
+					});
+				}
+			},
+			status:function()
+			{
+				this.parent.dom.setStyle(this.elements.status,{
+					//position:"relative",
+					//width	:"100%",
+					//font	:"normal 8pt tahoma",
+					//padding	:0,
+					//margin	:0,
+					//borderTop:"0px solid #A3A2BC",
+					//backgroundColor:"red",
+					//height:"100%"
+				});
+				this.parent.dom.setStyle(this.elements.status,this.setStyle.status || {});
 			},
 			fx:{
 				opacityShadow:{
@@ -781,12 +866,73 @@ leimnud.Package.Public({
 				break;
 				case "panel":
 				this.parent.dom.setStyle(this.elements.titleBar,{
-					background:"url("+this.parent.info.base+"images/panel.bg.title.gif)",
+					background:"url('"+this.parent.info.base+"images/panel.bg.title.gif')",
 					backgroundColor:"white",
 					backgroundRepeat:"repeat-x",
 					borderBottom:"1px solid #DBE0E5"
 				});
 				break;
+			}
+		};
+		this.command=function(fn,args,ret)
+		{
+			if(typeof fn==="function")
+			{
+				this.parent.exec(fn,args || false,ret || false,this);
+			}
+		};
+		this.loader={
+			show:function()
+			{	var stls = {
+				background:"url('../../processmap/core/images/loader_B.gif?s="+Math.random()+"')",
+				backgroundRepeat:"no-repeat",
+				backgroundPosition:"50% 50%",
+				backgroundColor:"white"
+			};
+			this.loader.before=this.parent.dom.getStyle(this.elements.content,stls);
+			this.parent.dom.setStyle(this.elements.content,stls);
+			},
+			hide:function()
+			{
+				this.parent.dom.setStyle(this.elements.content,{
+					//background:"url('../../processmap/core/images/bg_pm.gif')"
+					background:" "
+				});
+				this.parent.dom.setStyle(this.elements.content,this.loader.before);
+				delete(this.loader.before);
+			}
+		};
+		this.status={
+			show:function()
+			{
+				var hS=parseInt(this.parent.dom.getStyle(this.elements.statusBar,"height"),10);
+				var hC=parseInt(this.parent.dom.getStyle(this.elements.content,"height"),10);
+				this.parent.dom.setStyle(this.elements.statusBar,{
+					display:""
+				});
+				this.parent.dom.setStyle(this.elements.content,{
+					height:hC-hS
+				});
+				this.showing.status = true;
+			},
+			hide:function()
+			{
+				if(this.showing.status===true)
+				{
+					var hS=parseInt(this.parent.dom.getStyle(this.elements.statusBar,"height"),10);
+					var hC=parseInt(this.parent.dom.getStyle(this.elements.content,"height"),10);
+					this.parent.dom.setStyle(this.elements.statusBar,{
+						display:"none"
+					});
+					this.parent.dom.setStyle(this.elements.content,{
+						height:hC+hS
+					});
+					this.showing.status = false;
+				}
+			},
+			write:function()
+			{
+
 			}
 		};
 	}

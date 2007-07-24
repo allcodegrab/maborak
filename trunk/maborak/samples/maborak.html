@@ -8,7 +8,9 @@
 		leimnud.make();
 
 
-		leimnud.Package.Load("samples,rpc,drag,drop,panel",{Instance:leimnud,Type:"module"});
+		leimnud.Package.Load("samples,rpc,drag,drop,panel,app",{Instance:leimnud,Type:"module"});
+		leimnud.Package.Load("common",{Type:"file"});
+		leimnud.Package.Load("json",{Type:"file"});
 		leimnud.exec(leimnud.fix.memoryLeak);
 
 		//leimnud.Package.Load("processmap",{Type:"File"});

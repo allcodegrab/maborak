@@ -1,6 +1,21 @@
-/*
-* @class RPC
-* @autor MaBoRaK
+/***************************************************************************
+*     				  		   module.rpc.js
+*                        ------------------------
+*   Copyleft	: (c) 2007 maborak.com <maborak@maborak.com>
+*   Version		: 0.2
+*
+***************************************************************************/
+
+/***************************************************************************
+*
+*   This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation; either version 2 of the License, or
+*   (at your option) any later version.
+*
+***************************************************************************/
+/**
+* @class rpc
 */
 leimnud.Package.Public({
 	info	:{
@@ -30,7 +45,7 @@ leimnud.Package.Public({
 		*
 		*		||
 		*
-		*	process.callback=leimnud.execHandler({method:Myinstance.callback,instance:MyInstance,arguments:[process,"demo",99]});
+		*	process.callback=leimnud.closure({method:Myinstance.callback,instance:MyInstance,arguments:[process,"demo",99]});
 		*
 		*		||
 		*
@@ -45,7 +60,7 @@ leimnud.Package.Public({
 			this.headers=[];
 			this.core=function()
 			{
-				try {var xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");} catch (e) {try {var xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");} catch (E) {var xmlhttp = false;}}if (!xmlhttp && typeof XMLHttpRequest!='undefined') {var xmlhttp = new XMLHttpRequest();}if(!xmlhttp){this.error="Su navegador no soporta AJAX";}
+				try {var xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");} catch (e) {try {var xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");} catch (E) {var xmlhttp = false;}}if (!xmlhttp && typeof XMLHttpRequest!='undefined') {xmlhttp = new XMLHttpRequest();}if(!xmlhttp){this.error="Su navegador no soporta AJAX";}
 				return xmlhttp;
 			};
 			/*
@@ -59,8 +74,9 @@ leimnud.Package.Public({
 				this.method		=this.options.method.toUpperCase() || "POST";
 				this.args	=this.options.args || "";
 				this.async		=(this.options.async===false)?false:true;
-				(this.method=="POST")?this.header("Content-Type","application/x-www-form-urlencoded"):null;
+				if(this.method=="POST"){this.header("Content-Type","application/x-www-form-urlencoded");}
 				this.open();
+				return true;
 			};
 			/*
 			*
@@ -72,8 +88,8 @@ leimnud.Package.Public({
 				this.xmlhttp.open(this.method,((this.method=="GET")?this.url+this.args:this.url),this.async);
 				this.applyHeaders();
 				this.xmlhttp.send((this.method=="GET")?null:this.args);
-				this.xmlhttp.onreadystatechange=this.parent.execHandler({method:this.changes,instance:this,args:98989898});
-			};			
+				this.xmlhttp.onreadystatechange=this.parent.closure({method:this.changes,instance:this,args:98989898});
+			};
 			/*
 			*
 			* Method for this.xmlhttp.onreadystatechange
@@ -85,7 +101,7 @@ leimnud.Package.Public({
 				{
 					if(this.callback)
 					{
-						this.callback=(this.callback.isObject)?this.parent.execHandler(this.callback):this.callback;
+						this.callback=(this.callback.isObject)?this.parent.closure(this.callback):this.callback;
 						this.callback();
 					}
 				}

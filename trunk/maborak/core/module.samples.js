@@ -32,7 +32,7 @@ var samp = function()
 		args	:"u=iuiu"
 		});
 	t.header("algo","asdasdasd");
-	//t.callback=leimnud.execHandler({method:j.j,instance:j,arguments:[t,99]});
+	//t.callback=leimnud.closure({method:j.j,instance:j,arguments:[t,99]});
 	t.callback={Function:myFunction,args:[t,99]};
 	t.make();*/
 	/*
@@ -97,12 +97,12 @@ var samp = function()
 		control:{
 			close:true
 		},
-		fx:{modal:true}
+		fx:{modal:false}
 	};
 	myPanel2.setStyle={
-		modal:{backgroundColor:"black"},
-		shadow:{backgroundColor:"black"},
-		containerWindow:{border:"1px solid #666"}
+		//modal:{backgroundColor:"black"},
+		//shadow:{backgroundColor:"black"},
+		//containerWindow:{border:"1px solid #666"}
 	};
 	myPanel2.styles.fx.opacityModal.Static=80
 	myPanel2.tab={

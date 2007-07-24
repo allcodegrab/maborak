@@ -11,6 +11,6 @@ leimnud.Package.Public({
 		this.make=function()
 		{
 			alert("soy el modulo Grid");
-		}
+		};
 	}
 });

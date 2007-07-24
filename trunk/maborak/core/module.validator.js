@@ -16,7 +16,7 @@ leimnud.Package.Public({
 		this.generateKeys=function()
 		{
 			this.keys=[];
-			this.keys["es"]=[];
+			this.keys['es']=[];
 			this.keys["es"]["Alfa"]=["abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ","áéíóúñÁÉÍÓÚÑ"," "];
 			this.keys["es"]["Int"]=[[48,57]];
 			this.keys["es"]["Any"]=this.keys["es"]["Alfa"].concat("!#$%&/()=???+*{}[]-_.:,;'|\"\\@",[[48,57]]);
