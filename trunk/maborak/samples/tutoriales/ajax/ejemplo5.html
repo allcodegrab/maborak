@@ -1,0 +1,43 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+var XMLHttpObject = function()
+{
+	try{
+		var xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+	}
+	catch(e)
+	{
+		try
+		{
+			var xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		catch(e)
+		{
+			var xmlhttp = false;
+		}
+	}
+	return (!xmlhttp && typeof XMLHttpRequest!='undefined')?
+	new XMLHttpRequest():xmlhttp || new function(){};
+}
+var asin = function()
+{
+	var rpc = new XMLHttpObject();
+	var target = document.getElementById("target");
+	target.innerHTML="Loading......";
+	rpc.open("POST","ejemplo1_server.php",false);
+	rpc.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	rpc.send(encodeURI("param1=parametro1&param2=parametro2&param3=Hola mundo"));
+	target.innerHTML = rpc.responseText;
+}
+</script>
+</head>
+<body>
+<pre>
+<a href="#" onclick="asin(); return false;">Cargar petición síncrona</a>
+</pre>
+<pre id="target">
+</pre>
+</body>
+</html>

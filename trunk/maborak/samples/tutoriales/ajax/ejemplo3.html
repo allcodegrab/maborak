@@ -1,0 +1,58 @@
+<html>
+<head>
+<script type="text/javascript">
+var XMLHttpObject = function()
+{
+	try{
+		var xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+	}
+	catch(e)
+	{
+		try
+		{
+			var xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		catch(e)
+		{
+			var xmlhttp = false;
+		}
+	}
+	return (!xmlhttp && typeof XMLHttpRequest!='undefined')?
+	new XMLHttpRequest():xmlhttp || new function(){};
+}
+var incrustar=function()
+{
+	var rpc = new XMLHttpObject();
+	var div	= document.getElementById("target");
+	div.innerHTML="Cargando......";
+	rpc.open("POST","ejemplo3_server.php",true);
+	rpc.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	rpc.send();
+	rpc.onreadystatechange=function()
+	{
+		if(rpc.readyState===4)
+		{
+			div.innerHTML = rpc.responseText;
+		}
+	}
+}
+</script>
+<style>
+body
+{
+	font:normal 11px sans-serif;
+}
+</style>
+</head>
+<body>
+Vestibulum semper. Nullam non odio. Aliquam quam. Vestibulum semper. Nullam non odio.<br>
+Aliquam quam. Vestibulum semper. Nullam non odio. Aliquam quam. Vestibulum semper.<br>
+Nullam non odio. Aliquam quam. Vestibulum semper. Nullam non odio. Aliquam quam.<br>
+<div id="target" style="border:1px solid #EEE;padding:5px;color:#006699;">
+</div>
+<a href="#" onclick="incrustar(); return false;">Solicitar datos</a><br>
+Vestibulum semper. Nullam non odio. Aliquam quam. Vestibulum semper. Nullam non odio.<br>
+Aliquam quam. Vestibulum semper. Nullam non odio. Aliquam quam. Vestibulum semper.<br>
+Nullam non odio. Aliquam quam. Vestibulum semper. Nullam non odio. Aliquam quam.<br>
+</body>
+</html>
